@@ -1,6 +1,7 @@
 // Created by group 111
 // Course: Data Security
 // Autumn 2022
+// Program File for Role-Based Access Control
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;
@@ -13,8 +14,8 @@ import java.util.Scanner;
 public class Client {
     public static void main(String[] args) throws MalformedURLException, NotBoundException, RemoteException {
 
-        // From server 5099 in ApplicationServer.java file
-        Service service = (Service) Naming.lookup("rmi://localhost:3000/printer");
+        // From server 2000 in ApplicationServer.java file
+        Service service = (Service) Naming.lookup("rmi://localhost:2000/printer");
 
         Scanner scanner = new Scanner(System.in);
 
@@ -31,84 +32,18 @@ public class Client {
         System.out.println("Enter User ID: ");
         int userid = scanner.nextInt();
 
+        // variable for handling login credentials
         boolean status = service.credentials(username, password, userid);
 
+        // method to print out, printer functions the user is allowed to use
+        String methodAccessible = service.access(userid);
+
         if (status) {
-
             System.out.println("--- " + "You got access to the printer");
-            System.out.println();
-
-
-            // testing the program using the methods/functions from the Server.java file
-            System.out.println("--- " + service.print("picture.pdf", "X2"));
-            System.out.println("--- " + service.queue("X2"));
-            System.out.println("--- " + service.topQueue("X2", 2));
-            System.out.println("--- " + service.start());
-            System.out.println("--- " + service.stop());
-            System.out.println("--- " + service.restart());
-            System.out.println("--- " + service.status("printer status"));
-            System.out.println("--- " + service.readConfig("token"));
-            System.out.println("--- " + service.setConfig("map", "treasure"));
-        }
-
-
-        // goals:
-        // done with inserting employees in the database
-        // done with giving every employee an access control credential level in the database
-
-
-
-        // include login attempts
-        // include hashed and salted values for password in the database
-        // hide password
-        // control input of big letters and small letters
-
-
-
-        //if () {
-            // root admin
-            //System.out.println("--- " + service.print("picture.pdf", "X2"));
-            //System.out.println("--- " + service.queue("X2"));
-            //System.out.println("--- " + service.topQueue("X2", 2));
-            //System.out.println("--- " + service.start());
-            //System.out.println("--- " + service.stop());
-            //System.out.println("--- " + service.restart());
-            //System.out.println("--- " + service.status("printer status"));
-            //System.out.println("--- " + service.readConfig("token"));
-            //System.out.println("--- " + service.setConfig("map", "treasure"));
-        //}
-
-
-        //else if () {
-            // technician
-            //System.out.println("--- " + service.start());
-            //System.out.println("--- " + service.stop());
-            //System.out.println("--- " + service.restart());
-            //System.out.println("--- " + service.status("printer status"));
-            //System.out.println("--- " + service.readConfig("token"));
-            //System.out.println("--- " + service.setConfig("map", "treasure"));
-        //}
-
-
-
-        //else if () {
-            // power user
-            //System.out.println("--- " + service.print("picture.pdf", "X2"));
-            //System.out.println("--- " + service.queue("X2"));
-            //System.out.println("--- " + service.topQueue("X2", 2));
-            //System.out.println("--- " + service.restart());
-        //}
-
-
-        //else if () {
-            // ordinary user
-            //System.out.println("--- " + service.print("picture.pdf", "X2"));
-            //System.out.println("--- " + service.queue("X2"));
-        //}
-
-
-        else {
-            System.out.println("You are not authorized to use this printer");
+            System.out.println("--- " + "You have access to these functions: ");
+            System.out.println(methodAccessible);
+        } else {
+            System.out.println("--- " + "You are not authorized to use this printer");
         }
         scanner.close();
     }

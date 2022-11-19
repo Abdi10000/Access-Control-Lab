@@ -1,13 +1,12 @@
 // Created by group 111
 // Course: Data Security
 // Autumn 2022
+// Program File for Role-Based Access Control
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
+import static java.sql.DriverManager.getConnection;
 
 public class Server extends UnicastRemoteObject implements Service {
 
@@ -73,25 +72,21 @@ public class Server extends UnicastRemoteObject implements Service {
     // function used to allow access to printer having the right
     // credentials stored in the database
     public boolean credentials(String username, String password, int userID) {
-        String db = "jdbc:mysql://localhost:3306/printer";
-        String user = "root";
-        String pass = "toor";
-        int attempts = 3;
 
         try {
-            // connect to the mysql database
-            Connection connection = DriverManager.getConnection(db, user, pass);
+            String url = "jdbc:sqlite:Printer.db";
+            Connection connection = getConnection(url);
             Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM printer.Employee");
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM Employee");
 
             while (resultSet.next()) {
                 String name = resultSet.getString("Username");
                 String passWord = resultSet.getString("Password");
                 int userid = resultSet.getInt("User_ID");
-                //String roleType = resultSet.getString("");
 
                 if (username.equals(name) && password.equals(passWord) && userID == userid) {
                     System.out.println("Correctly logged inside the account");
+                    System.out.println();
                     return true;
                 } else {
                     System.out.println("User does not exist in the database");
@@ -103,5 +98,30 @@ public class Server extends UnicastRemoteObject implements Service {
             System.out.println(e);
         }
         return false;
+    }
+
+
+    // Method used to show printer functions the user has access to
+    // based on Role-Based Access Control
+    public String access(int userid) {
+        String accessFunction = "";
+
+        try {
+            String url = "jdbc:sqlite:Printer.db";
+            Connection connection = getConnection(url);
+            Statement statement = connection.createStatement();
+            String sql = "SELECT Role_Details.Permission FROM Role_Details INNER JOIN Role ON Role_Details.Role_ID = Role.Role_ID WHERE Role.User_ID = '" + userid + "';";
+            ResultSet resultSet1 = statement.executeQuery(sql);
+
+            while (resultSet1 != null && resultSet1.next()) {
+
+                accessFunction = resultSet1.getString(1);
+                System.out.println(accessFunction);
+            }
+            connection.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return accessFunction;
     }
 }
