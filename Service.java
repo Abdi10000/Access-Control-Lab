@@ -1,6 +1,7 @@
 // Created by group 111
 // Course: Data Security
 // Autumn 2022
+// Program File for Access Control List
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -26,4 +27,6 @@ public interface Service extends Remote {
     String setConfig(String parameter, String value) throws RemoteException;
 
     boolean credentials(String username, String password, int userID) throws RemoteException;
+
+    String access(int userid) throws RemoteException;
 }
